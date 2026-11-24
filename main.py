@@ -1,5 +1,4 @@
 import sys
-from collections import Counter
 lettere= "abcdefghijklmnopqrstuvwxyz"
 play={}
 pos1=""
@@ -72,25 +71,24 @@ riflettore = {
 }
 
 def gira(dic1,dic2,dic3,count1,count2,count3):
-    count1+=1
-    if count1==27:
-        count1=0
-        count2+=1
-    if count2 ==27:
-         count3+=1
-         count2=0
-    if count3==27:
-        count3=0
     dicc1=dic1.copy()
     dicc2=dic2.copy()
     dicc3=dic3.copy()
-    for n, char in enumerate(lettere):
-         
-         dic1[char]=dicc1[lettere[(n+1)%26]]
-         
-         dic2[char]=dicc2[lettere[(n+1)%26]]
-         
-         dic3[char]=dicc3[lettere[(n+1)%26]]
+    for n, char in enumerate(lettere):      
+        dic1[char]=dicc1[lettere[(n+1)%26]]
+    count1+=1
+    if count1==26:
+        count1=0
+        for n, char in enumerate(lettere):
+                 dic2[char]=dicc2[lettere[(n+1)%26]]
+        count2+=1
+    if count2 ==26:
+         for n, char in enumerate(lettere):
+                  dic3[char]=dicc3[lettere[(n+1)%26]]
+         count3+=1
+         count2=0
+    if count3==26:
+        count3=0
     return(dic1,dic2,dic3,count1,count2,count3)
     
 def ordina(dic1,dic2,dic3,pos1,pos2,pos3):
@@ -164,32 +162,57 @@ def playground(char, play):
         else:
             final=char
     return(final)
-
+def menu():
+     print(r"""    _______   ______________  ______      ______  __
+   / ____/ | / /  _/ ____/  |/  /   |    / __ \ \/ /
+  / __/ /  |/ // // / __/ /|_/ / /| |   / /_/ /\  / 
+ / /___/ /|  // // /_/ / /  / / ___ |_ / ____/ / /  
+/_____/_/ |_/___/\____/_/  /_/_/  |_(_)_/     /_/   
+                                                    """)
 def main():
+    menu()
     let=""
     text=input("inserisci un testo: ")
     text="".join(c for c in text.casefold() if c in lettere)
-    n=int(input("quale deve essere il primo rotore? "))
-    dic1=rot[n]
+  
+    try:
+            n=int(input("quale deve essere il primo rotore? "))
+            dic1=rot[n]
+            
+    except:
+              sys.exit("Coglione, deve essere UN NUMERO da 1 A 5!! ")
+    
     del rot[n]
     while n not in rot:
-        n=int(input("quale deve essere il secondo rotore? "))
+            try:
+                n=int(input("quale deve essere il secondo rotore? "))
+            except:
+                  sys.exit("Coglione, deve essere UN NUMERO!! ")
     dic2=rot[n]
     del rot[n]
     while n not in rot:
-            n=int(input("quale deve essere il terzo rotore? "))
+                    try:
+                        n=int(input("quale deve essere il terzo rotore? "))
+                    except:
+                          sys.exit("Coglione, deve essere UN NUMERO!! ")
     dic3=rot[n]
-    pos1=input("prima posizione del primo rotore: ")
-    pos2=input("prima posizione del secondo rotore: ")
-    pos3=input("prima posizione del terzo rotore: ")
+    pos1="@@"
+    pos2="@#"
+    pos3="@#"
+    while pos1 not in lettere or len(pos1)!=1:
+        pos1=input("prima posizione del primo rotore: ").casefold()
+    while pos2 not in lettere or len(pos2)!=1:
+        pos2=input("prima posizione del secondo rotore: ").casefold()
+    while pos3 not in lettere or len(pos3)!=1:
+        pos3=input("prima posizione del terzo rotore: ").casefold()
     for i in range(6): 
          while True :
-            let=input(f"1° lettera del collegamento numero {i}/6")
-            if let not in play:
+            let=input(f"1° lettera del collegamento numero {i+1}/6").casefold()
+            if let not in play and let not in play.values() and let in lettere and len(let)==1:
                   break
          while True:
-            let2=input(f"2° lettera del collegamento numero {i}/6")
-            if let2 not in play:
+            let2=input(f"2° lettera del collegamento numero {i+1}/6").casefold()
+            if let2 not in play and let2 not in play.values() and let2!=let and let2 in lettere and len(let2)==1:
                   break
          play[let]=let2
     testo=enigma(dic1,dic2,dic3, text,riflettore,pos1,pos2,pos3, play)
@@ -197,5 +220,6 @@ def main():
 
 if __name__=="__main__":
     main()
+
 
 
