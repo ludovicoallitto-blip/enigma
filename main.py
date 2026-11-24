@@ -1,6 +1,7 @@
 import sys
 from collections import Counter
 lettere= "abcdefghijklmnopqrstuvwxyz"
+play={}
 pos1=""
 pos2=""
 pos3=""
@@ -80,10 +81,16 @@ def gira(dic1,dic2,dic3,count1,count2,count3):
          count2=0
     if count3==27:
         count3=0
+    dicc1=dic1.copy()
+    dicc2=dic2.copy()
+    dicc3=dic3.copy()
     for n, char in enumerate(lettere):
-         dic1[char]=dic1[lettere[(n+1)%26]]
-         dic2[char]=dic2[lettere[(n+1)%26]]
-         dic3[char]=dic3[lettere[(n+1)%26]]
+         
+         dic1[char]=dicc1[lettere[(n+1)%26]]
+         
+         dic2[char]=dicc2[lettere[(n+1)%26]]
+         
+         dic3[char]=dicc3[lettere[(n+1)%26]]
     return(dic1,dic2,dic3,count1,count2,count3)
     
 def ordina(dic1,dic2,dic3,pos1,pos2,pos3):
@@ -92,36 +99,39 @@ def ordina(dic1,dic2,dic3,pos1,pos2,pos3):
             if valore==pos1:
                 break
     imp2=lettere.index(chiave)
-    dic=dic1
+    dic=dic1.copy()
     for char in lettere:
-         dic1[char]=dic[lettere[imp2]]
+         dic1[char]=dic[lettere[imp2%26]]
          imp2+=1
 
     for chiave, valore in dic2.items():
                 if valore==pos2:
                     break
     imp2=lettere.index(chiave)
-    dic=dic2
+    dic=dic2.copy()
     for char in lettere:
-             dic2[char]=dic[lettere[imp2]]
+             dic2[char]=dic[lettere[imp2%26]]
              imp2+=1
     for chiave, valore in dic3.items():
                 if valore==pos3:
                     break
     imp2=lettere.index(chiave)
-    dic=dic3
+    dic=dic3.copy()
     for char in lettere:
-             dic3[char]=dic[lettere[imp2]]
+             dic3[char]=dic[lettere[imp2%26]]
              imp2+=1
 
-def enigma(dic1,dic2,dic3,text,riflettore,pos1,pos2,pos3):
+def enigma(dic1,dic2,dic3,text,riflettore,pos1,pos2,pos3,play):
+    dic1=dic1.copy()
+    dic2=dic2.copy()
+    dic3=dic3.copy()
     finale=[]
     count1,count2,count3=0,0,0
     ordina(dic1,dic2,dic3,pos1,pos2,pos3)
     for char in text:
         
-        dic1,dic2,dic3=gira(dic1,dic2,dic3,count1,count2,count3)
-        final=playground(char)
+        dic1,dic2,dic3,count1,count2,count3=gira(dic1,dic2,dic3,count1,count2,count3)
+        final=playground(char,play)
         final=dic1[final]
         final=dic2[final]
         final=dic3[final]
@@ -139,19 +149,24 @@ def enigma(dic1,dic2,dic3,text,riflettore,pos1,pos2,pos3):
                     if valore==final:
                         final=chiave
                         break
-        final=playground(final)
+        final=playground(final,play)
         finale.append(final)
     text="".join(finale)
     return(text)
-def playground(finale):
-    if finale=="a":
-        return("j")
-    elif finale=="j":
-        return("a")
-    else:
-        return(finale)
+def playground(char, play):
+    for chiave, valore in play.items():
+        if valore==char:
+            final=chiave
+            break
+        elif chiave==char:
+             final=valore
+             break
+        else:
+            final=char
+    return(final)
 
 def main():
+    let=""
     text=input("inserisci un testo: ")
     text="".join(c for c in text.casefold() if c in lettere)
     n=int(input("quale deve essere il primo rotore? "))
@@ -162,10 +177,25 @@ def main():
     dic2=rot[n]
     del rot[n]
     while n not in rot:
-            n=int(input("quale deve essere il secondo rotore? "))
+            n=int(input("quale deve essere il terzo rotore? "))
     dic3=rot[n]
-    testo=enigma(dic1,dic2,dic3, text,riflettore,pos1,pos2,pos3)
+    pos1=input("prima posizione del primo rotore: ")
+    pos2=input("prima posizione del secondo rotore: ")
+    pos3=input("prima posizione del terzo rotore: ")
+    for i in range(6): 
+         while True :
+            let=input(f"1° lettera del collegamento numero {i}/6")
+            if let not in play:
+                  break
+         while True:
+            let2=input(f"2° lettera del collegamento numero {i}/6")
+            if let2 not in play:
+                  break
+         play[let]=let2
+    testo=enigma(dic1,dic2,dic3, text,riflettore,pos1,pos2,pos3, play)
     print(testo)
 
 if __name__=="__main__":
     main()
+
+
